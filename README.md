@@ -9,12 +9,22 @@ Proof-of-concept exploits and [Nuclei](https://github.com/projectdiscovery/nucle
 
 ## Repository Layout
 
-| Directory | Contents |
-| --- | --- |
-| `nuclei-templates/` | Nuclei templates for detecting vulnerable systems |
-| `exploits/` | Proof-of-concept exploit code |
+Each vulnerability has its own directory named after its CVE identifier:
 
-Each entry documents the affected product and versions, the vulnerability, references (CVE identifiers, advisories), and remediation guidance where available.
+```
+CVE-YYYY-NNNNNN/
+├── nuclei-template.yaml          # Nuclei detection template
+├── nuclei-template-active.yaml   # Active verification variant, where provided
+└── ...                           # Exploit code and notes, where published
+```
+
+Each template's `info` block documents the affected product and versions, the vulnerability, references (CVE identifiers, advisories), and remediation guidance.
+
+| CVE | Name | Templates |
+| --- | --- | --- |
+| [CVE-2026-109618](CVE-2026-109618/) | PHP OOM corruption (php2shell) | `nuclei-template.yaml` |
+| [CVE-2026-109619](CVE-2026-109619/) | PHP `session.upload_progress` use-after-free (php2shell) | `nuclei-template.yaml`, `nuclei-template-active.yaml` |
+| [CVE-2026-111497](CVE-2026-111497/) | Node.js Brotli decoder out-of-bounds write (Node2Shell) | `nuclei-template.yaml` |
 
 ## Usage
 
@@ -22,15 +32,17 @@ Each entry documents the affected product and versions, the vulnerability, refer
 
 ```bash
 # Run a single template against a target
-nuclei -u https://target.example.com -t nuclei-templates/<template>.yaml
+nuclei -u https://target.example.com -t CVE-2026-109619/nuclei-template.yaml
 
-# Run every template in the directory against a list of targets
-nuclei -l targets.txt -t nuclei-templates/
+# Run a template against a list of targets
+nuclei -l targets.txt -t CVE-2026-109619/nuclei-template.yaml
 ```
+
+Templates tagged `active` or `destructive` send large or malformed requests that can crash worker processes. Read the template's `description` before running it.
 
 ### Exploits
 
-See the README in each exploit's directory for requirements and usage instructions.
+Exploit code, where published, sits in the CVE's directory alongside usage notes.
 
 ## Disclaimer
 
