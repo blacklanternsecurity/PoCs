@@ -25,8 +25,13 @@ Each template's `info` block documents the affected product and versions, the vu
 | [CVE-2026-109618](CVE-2026-109618/) | PHP OOM corruption (php2shell) | `nuclei-template.yaml` |
 | [CVE-2026-109619](CVE-2026-109619/) | PHP `session.upload_progress` use-after-free (php2shell) | `nuclei-template.yaml`, `nuclei-template-active.yaml`, `nuclei-template-active-v2.yaml` |
 | [CVE-2026-111497](CVE-2026-111497/) | Node.js Brotli decoder out-of-bounds write (Node2Shell) | `nuclei-template.yaml` |
-| [CVE-2026-115560](CVE-2026-115560/) | PHP session serialize handler mismatch | `nuclei-template.yaml` |
+| [CVE-2026-115560](CVE-2026-115560/) | PHP session serialize handler mismatch | `nuclei-template.yaml`, `nuclei-template-v2.yaml` |
+| [CVE-2026-126714](CVE-2026-126714/) | PHP partially overwritten session files | `nuclei-template.yaml` |
 | [CVE-2026-129289](CVE-2026-129289/) | PHP-FPM FastCGI request smuggling via unread request body | `nuclei-template.yaml`, `nuclei-template-active.yaml` |
+| [CVE-2026-129182](CVE-2026-129182/) | PHP 8.5 `last_fatal_error_backtrace` use-after-free | `nuclei-template.yaml` |
+| [CVE-2026-129474](CVE-2026-129474/) | PHP 8.5 magic method backtrace use-after-free | `nuclei-template.yaml` |
+| [CVE-2026-129481](CVE-2026-129481/) | PHP use-after-free after interrupted session shutdown | `nuclei-template.yaml` |
+| [CVE-2026-129496](CVE-2026-129496/) | PHP timezone cache use-after-free | `nuclei-template.yaml` |
 
 ## Usage
 
@@ -41,6 +46,21 @@ nuclei -l targets.txt -t CVE-2026-109619/nuclei-template.yaml
 ```
 
 Templates tagged `active` or `destructive` send large or malformed requests that can crash worker processes. Read the template's `description` before running it.
+
+### PHP November 2026 templates
+
+```bash
+nuclei -l urls.txt -nmhe -timeout 25 \
+  -t CVE-2026-115560/nuclei-template-v2.yaml -t CVE-2026-126714/ -t CVE-2026-129496/ \
+  -t CVE-2026-129481/ -t CVE-2026-129474/ -t CVE-2026-129182/ \
+  -t CVE-2026-129289/nuclei-template.yaml
+```
+
+- Feed post-redirect URLs (for example the final URL from `httpx -fr`). The upload-progress POSTs go to the scanned URL and do not follow redirects.
+- `-nmhe` keeps nuclei from dropping a host for every template after a single timeout. Without it, one slow POST can hide that host's version finding.
+- The upload-progress probes start with a 135 KB junk field so WAFs that inspect only the first 128 KB of a body (Cloudflare, Azure WAF, Akamai, AWS WAF, Cloud Armor) do not answer them with 403. Without padding, a blocked probe looks the same as upload progress being Off.
+- Re-probe a `version-hidden-upload-progress-on` result once before reporting it. Applications that set their own `PHPSESSID` intermittently can still produce a false positive.
+- `CVE-2026-129289/nuclei-template-active.yaml` executes PHP on the target. Run it only where that is authorized.
 
 ### Exploits
 
