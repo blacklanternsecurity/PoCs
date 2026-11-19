@@ -26,6 +26,7 @@ Each template's `info` block documents the affected product and versions, the vu
 | [CVE-2026-109619](CVE-2026-109619/) | PHP `session.upload_progress` use-after-free (php2shell) | `nuclei-template.yaml`, `nuclei-template-active.yaml`, `nuclei-template-active-v2.yaml` |
 | [CVE-2026-111497](CVE-2026-111497/) | Node.js Brotli decoder out-of-bounds write (Node2Shell) | `nuclei-template.yaml` |
 | [CVE-2026-115560](CVE-2026-115560/) | PHP session serialize handler mismatch | `nuclei-template.yaml` |
+| [CVE-2026-129289](CVE-2026-129289/) | PHP-FPM FastCGI request smuggling via unread request body | `nuclei-template.yaml`, `nuclei-template-active.yaml` |
 
 ## Usage
 
